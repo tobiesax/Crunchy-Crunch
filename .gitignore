@@ -6,3 +6,5 @@ node_modules/
 data/store.json
 .thumbnail
 uploads/
+
+.vercel

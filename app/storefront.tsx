@@ -1,7 +1,7 @@
 "use client";
 
 import type { Product } from "@/lib/types";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 type Basket = Record<string, number>;
 type IconName = "delivery" | "shield" | "gift" | "heart" | "ingredients" | "trusted";
@@ -24,6 +24,10 @@ export default function Storefront({ products }: { products: Product[] }) {
   const items = products.filter((p) => basket[p.id]).map((p) => ({ ...p, quantity: basket[p.id] }));
   const subtotal = useMemo(() => items.reduce((sum, item) => sum + item.price * item.quantity, 0), [items]);
   const count = Object.values(basket).reduce((sum, quantity) => sum + quantity, 0);
+  useEffect(() => {
+    const hash = window.location.hash;
+    if (hash.includes("type=recovery") || hash.includes("type=invite")) window.location.replace(`/set-password${hash}`);
+  }, []);
   const add = (id: string) => setBasket((current) => ({ ...current, [id]: (current[id] ?? 0) + 1 }));
   const change = (id: string, amount: number) => setBasket((current) => { const next = Math.max(0, (current[id] ?? 0) + amount); const copy = { ...current }; if (next) copy[id] = next; else delete copy[id]; return copy; });
 

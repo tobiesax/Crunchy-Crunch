@@ -1,0 +1,41 @@
+name: Database backup
+
+on:
+  schedule:
+    - cron: "20 1 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Install PostgreSQL client
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes postgresql-client
+
+      - name: Create logical backup
+        env:
+          DATABASE_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          test -n "$DATABASE_URL"
+          mkdir -p backup
+          pg_dump "$DATABASE_URL" --format=custom --no-owner --no-acl --file backup/database.dump
+          pg_dump "$DATABASE_URL" --schema=public --schema-only --no-owner --no-acl --file backup/public-schema.sql
+          pg_restore --list backup/database.dump > backup/restore-manifest.txt
+          test -s backup/database.dump
+          test -s backup/restore-manifest.txt
+          sha256sum backup/database.dump backup/public-schema.sql > backup/SHA256SUMS
+
+      - name: Store verified backup for seven days
+        uses: actions/upload-artifact@v4
+        with:
+          name: crunchy-crunch-db-${{ github.run_id }}
+          path: backup/
+          retention-days: 7
+          if-no-files-found: error
+          compression-level: 9

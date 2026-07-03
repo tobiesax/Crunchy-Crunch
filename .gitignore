@@ -8,3 +8,5 @@ data/store.json
 uploads/
 
 .vercel
+supabase/.temp/
+backups/

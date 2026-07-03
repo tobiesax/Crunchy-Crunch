@@ -81,3 +81,9 @@ Automated events currently include:
 - Create database backups and an incident/contact process.
 - Add rate limiting and bot protection before public campaigns.
 - Obtain customer consent and publish privacy, delivery and refund policies.
+
+## Free-tier database backups
+
+The workflow at `.github/workflows/database-backup.yml` creates a nightly logical PostgreSQL backup, verifies that `pg_restore` can read its manifest, records SHA-256 checksums and retains the private GitHub artifact for seven days.
+
+Add the Supabase non-pooling connection string to the GitHub repository as an Actions secret named `SUPABASE_DB_URL`. Find it in Vercel as `POSTGRES_URL_NON_POOLING`; never paste it into a workflow file or commit it. Run **Database backup** manually once after adding the secret and confirm that the artifact contains `database.dump`, `public-schema.sql`, `restore-manifest.txt` and `SHA256SUMS`.

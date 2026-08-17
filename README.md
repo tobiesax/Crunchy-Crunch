@@ -1,4 +1,4 @@
-# Crunch & Crumbs Commerce
+# Crunchy Bites Commerce
 
 A WhatsApp-first storefront and merchant operations dashboard. Customers place structured orders on the storefront; merchants manage fulfilment in a protected dashboard; each order and status change produces a WhatsApp automation event.
 

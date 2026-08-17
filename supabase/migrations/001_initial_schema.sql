@@ -107,7 +107,7 @@ create policy "staff update orders" on public.orders for update using (exists(se
 create policy "members read order items" on public.order_items for select using (public.is_merchant_member(merchant_id));
 create policy "members read events" on public.automation_events for select using (public.is_merchant_member(merchant_id));
 
-insert into public.merchants (slug, name) values ('crunch-and-crumbs', 'Crunch & Crumbs') on conflict do nothing;
+insert into public.merchants (slug, name) values ('crunch-and-crumbs', 'Crunchy Bites') on conflict do nothing;
 insert into public.products (merchant_id, external_id, name, description, price, image)
 select m.id, p.external_id, p.name, p.description, p.price, p.image from public.merchants m cross join (values
   ('cookie-stack','Chocolate Chip Cookies','Soft, chewy and loaded with chocolate chips.',25.00,'/assets/products/cookie-stack.jpg'),

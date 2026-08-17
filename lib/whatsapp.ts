@@ -9,7 +9,7 @@ export function statusMessage(name: string, orderId: string, status: OrderStatus
   const messages: Partial<Record<OrderStatus, string>> = {
     payment_pending: `Hi ${name}! Order ${orderId} is awaiting payment. Reply here if you need payment details.`,
     confirmed: `Great news, ${name}! Payment for order ${orderId} is confirmed. We’ll begin preparing your treats.`,
-    preparing: `Your Crunch & Crumbs order ${orderId} is now being prepared with love.`,
+    preparing: `Your Crunchy Bites order ${orderId} is now being prepared with love.`,
     ready: `Order ${orderId} is ready! We’ll contact you now with collection or delivery details.`,
     delivered: `Order ${orderId} has been delivered. Thank you, ${name}! We’d love to hear how you enjoyed it.`,
   };

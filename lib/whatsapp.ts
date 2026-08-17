@@ -2,7 +2,8 @@ import type { Order, OrderStatus } from "./types";
 
 export function orderConfirmation(order: Order) {
   const lines = order.items.map((item) => `${item.quantity} × ${item.name}`).join("\n");
-  return `Hi ${order.customerName}! We received order ${order.id}.\n\n${lines}\n\nTotal: R${order.total.toFixed(2)}\n\nReply here if you need any help.`;
+  const eft = `Pay via EFT:\nBank: Capitec\nAccount holder: Mrs Oluwaseun Odeyemi\nAccount type: Main Account\nAccount number: 2203718885\nBranch code: 470010\nSWIFT/BIC: CABLZAJJ\n\nPlease use ${order.id} as your payment reference.`;
+  return `Hi ${order.customerName}! We received order ${order.id}.\n\n${lines}\n\nTotal: R${order.total.toFixed(2)}\n\n${eft}\n\nReply here if you need any help.`;
 }
 
 export function statusMessage(name: string, orderId: string, status: OrderStatus) {

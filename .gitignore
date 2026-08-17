@@ -10,3 +10,4 @@ uploads/
 .vercel
 supabase/.temp/
 backups/
+tools/

@@ -1,58 +1,68 @@
 "use client";
 
-import type { Product } from "@/lib/types";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
-type Basket = Record<string, number>;
-type IconName = "delivery" | "shield" | "gift" | "heart" | "ingredients" | "trusted";
+const looks = [
+  { name: "Amber Blazer", type: "Outerwear", price: "R3,200", image: "https://images.unsplash.com/photo-1539109136881-3be0616acf4b?auto=format&fit=crop&w=700&q=90" },
+  { name: "Onyx Midi Dress", type: "Dresses", price: "R2,800", image: "https://images.unsplash.com/photo-1566174053879-31528523f8ae?auto=format&fit=crop&w=700&q=90" },
+  { name: "Noir Wide Leg Trousers", type: "Bottoms", price: "R1,950", image: "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?auto=format&fit=crop&w=700&q=90" },
+  { name: "Gold Evening Gown", type: "Occasionwear", price: "R5,400", image: "https://images.unsplash.com/photo-1595777457583-95e059d581b8?auto=format&fit=crop&w=700&q=90" },
+];
 
-function Icon({ name, size = 28 }: { name: IconName; size?: number }) {
-  const common = { width: size, height: size, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 1.7, strokeLinecap: "round" as const, strokeLinejoin: "round" as const, "aria-hidden": true };
-  if (name === "delivery") return <svg {...common}><rect x="1" y="6" width="13" height="10" rx="1"/><path d="M14 9h4l3 3v4h-7z"/><circle cx="6" cy="18" r="1.8"/><circle cx="17" cy="18" r="1.8"/></svg>;
-  if (name === "shield") return <svg {...common}><path d="M12 2l8 3v6c0 5-3.5 8.5-8 11-4.5-2.5-8-6-8-11V5z"/><path d="M9 12l2 2 4-4"/></svg>;
-  if (name === "gift") return <svg {...common}><rect x="3" y="8" width="18" height="13" rx="1"/><path d="M3 12h18M12 8v13M12 8S9 3 6.5 4.5 8 8 12 8zM12 8s3-5 5.5-3.5S16 8 12 8z"/></svg>;
-  if (name === "heart") return <svg {...common}><path d="M12 21C7 17 3 13.5 3 9a4.5 4.5 0 0 1 9-1 4.5 4.5 0 0 1 9 1c0 4.5-4 8-9 12z"/></svg>;
-  if (name === "ingredients") return <svg {...common}><path d="M4 13a8 8 0 0 0 16 0H4z"/><path d="M12 13V7M9 7c0-2 1.5-3 3-3s3 1 3 3"/></svg>;
-  return <svg {...common}><circle cx="12" cy="8" r="6"/><path d="M8.5 13.5L7 22l5-3 5 3-1.5-8.5"/></svg>;
+function Icon({ name }: { name: string }) {
+  const p = { width: 24, height: 24, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 1.3, strokeLinecap: "round" as const, strokeLinejoin: "round" as const };
+  if (name === "search") return <svg {...p}><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>;
+  if (name === "heart") return <svg {...p}><path d="M20.8 4.7a5.5 5.5 0 0 0-7.8 0L12 5.8l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.8-7.4 1.1-1.1a5.5 5.5 0 0 0-.1-7.8Z"/></svg>;
+  if (name === "user") return <svg {...p}><circle cx="12" cy="8" r="4"/><path d="M4.5 21a7.5 7.5 0 0 1 15 0Z"/></svg>;
+  if (name === "scissors") return <svg {...p}><circle cx="6" cy="7" r="3"/><circle cx="6" cy="17" r="3"/><path d="m8.7 8.4 11.3 6.4M8.7 15.6 20 9.2"/></svg>;
+  if (name === "truck") return <svg {...p}><path d="M3 6h11v11H3zM14 10h4l3 3v4h-7z"/><circle cx="7" cy="19" r="2"/><circle cx="18" cy="19" r="2"/></svg>;
+  if (name === "fabric") return <svg {...p}><path d="m4 4 4 2 4-2 4 2 4-2v16l-4-2-4 2-4-2-4 2Z"/><path d="m4 12 4-2 4 2 4-2 4 2"/></svg>;
+  return <svg {...p}><path d="M12 3v18M5 8h14M7 3h10M7 21h10"/></svg>;
 }
 
-export default function Storefront({ products }: { products: Product[] }) {
-  const [basket, setBasket] = useState<Basket>({});
-  const [checkout, setCheckout] = useState(false);
-  const [busy, setBusy] = useState(false);
-  const [result, setResult] = useState("");
-  const items = products.filter((p) => basket[p.id]).map((p) => ({ ...p, quantity: basket[p.id] }));
-  const subtotal = useMemo(() => items.reduce((sum, item) => sum + item.price * item.quantity, 0), [items]);
-  const count = Object.values(basket).reduce((sum, quantity) => sum + quantity, 0);
-  useEffect(() => {
-    const hash = window.location.hash;
-    if (hash.includes("type=recovery") || hash.includes("type=invite")) window.location.replace(`/set-password${hash}`);
-  }, []);
-  const add = (id: string) => setBasket((current) => ({ ...current, [id]: (current[id] ?? 0) + 1 }));
-  const change = (id: string, amount: number) => setBasket((current) => { const next = Math.max(0, (current[id] ?? 0) + amount); const copy = { ...current }; if (next) copy[id] = next; else delete copy[id]; return copy; });
+export default function Storefront() {
+  const [menu, setMenu] = useState(false);
+  const [bag, setBag] = useState(0);
+  const [notice, setNotice] = useState(0);
+  useEffect(() => { if (!notice) return; const t = setTimeout(() => setNotice(0), 2400); return () => clearTimeout(t); }, [notice]);
+  const add = () => { setBag(v => v + 1); setNotice(1); };
+  return <div className="vonga">
+    <div className="v-top"><span>◆ &nbsp; BESPOKE TAILORING</span><span>◆ &nbsp; MADE TO MEASURE</span><span>◆ &nbsp; PRETORIA BOUTIQUE</span><span>◆ &nbsp; NATIONWIDE DELIVERY</span><span>◆ &nbsp; FREE DELIVERY OVER R1500</span></div>
+    <header className="v-header">
+      <a className="v-logo" href="#">VONGA</a>
+      <button className="v-menu" onClick={() => setMenu(!menu)} aria-label="Toggle menu"><i/><i/></button>
+      <nav className={menu ? "open" : ""}>{["New Arrivals","Collections","Bespoke","Lookbook","About","Contact"].map(x => <a key={x} href={`#${x.toLowerCase().replace(" ", "-")}`} onClick={() => setMenu(false)}>{x}</a>)}</nav>
+      <div className="v-tools"><button><Icon name="search"/></button><button><Icon name="heart"/></button><button><Icon name="user"/></button><button className="bag" onClick={() => setNotice(2)}>Bag ({bag})</button></div>
+    </header>
 
-  async function placeOrder(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault(); setBusy(true); setResult("");
-    const form = new FormData(event.currentTarget);
-    const response = await fetch("/api/orders", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: form.get("name"), phone: form.get("phone"), address: form.get("address"), notes: form.get("notes"), items: items.map((item) => ({ productId: item.id, name: item.name, price: item.price, quantity: item.quantity })) }) });
-    const data = await response.json(); setBusy(false);
-    if (!response.ok) return setResult(data.error ?? "Order could not be placed.");
-    setResult(`Order ${data.order.id} is confirmed. We'll continue with you on WhatsApp.`); setBasket({});
-  }
+    <main>
+      <section className="v-hero">
+        <div className="hero-copy"><p>New Collection 2026</p><h1>Wear<br/>Your<br/><em>Story.</em></h1><div className="mini-rule"/><span>Bespoke fashion crafted for<br/>the woman who commands<br/>every room.</span><div className="hero-buttons"><a href="#new-arrivals">Shop New Arrivals</a><a href="#lookbook">View Lookbook</a></div></div>
+        <div className="hero-model" role="img" aria-label="Vonga ivory tailoring campaign"/>
+        <div className="scroll-mark">SCROLL</div><button className="disc" aria-label="Play collection film"><b>▶</b><span>DISCOVER THE COLLECTION • </span></button>
+      </section>
 
-  return <>
-    <div className="announcement"><span className="announcementLead">✦ &nbsp; FREE DELIVERY FOR ORDERS OVER R200</span><span>Homemade with love in South Africa</span><span className="socialMini">Instagram &nbsp; Facebook</span></div>
-    <header><a className="brand" href="#top"><img src="/assets/logo.png" alt="Crunch & Crumbs"/></a><nav><a href="#top">Home</a><a href="#products">Shop</a><a href="#products">Gift Boxes</a><a href="#story">About Us</a><a href="#reviews">Reviews</a><a href="#contact">Contact</a></nav><button className="cartButton" onClick={() => setCheckout(true)} aria-label={`Open basket with ${count} items`}><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg><b>{count}</b></button></header>
-    <main id="top">
-      <section className="hero"><img src="/assets/products/hero-composed.jpg" alt="Cookies and chinchin"/><div className="heroShade"/><div className="heroCopy"><p className="script">Freshly baked ♡</p><h1>Cookies &amp;<br/>Authentic<br/><em>Nigerian Chinchin</em></h1><p>Homemade with love. Crafted for every celebration, snack break and special moment.</p><div className="heroActions"><a className="primary" href="#products">ORDER YOUR FAVOURITES</a><a className="secondary" href="#products">VIEW OUR PRODUCTS</a></div><div className="heroTrust"><span><Icon name="ingredients" size={19}/><b>Freshly Made</b><small>In small batches</small></span><span><Icon name="trusted" size={19}/><b>Premium</b><small>Quality ingredients</small></span><span><Icon name="shield" size={19}/><b>Hygienic</b><small>Clean production</small></span></div></div></section>
-      <section className="features"><div><Icon name="delivery"/><b>Fast Delivery</b><span>Quick and reliable delivery</span></div><div><Icon name="shield"/><b>Secure Packaging</b><span>Keeps every bite fresh</span></div><div><Icon name="gift"/><b>Perfect for Gifting</b><span>Beautifully packed</span></div><div><Icon name="heart"/><b>Made with Love</b><span>Crafted in every batch</span></div></section>
-      <section className="products" id="products"><div className="sectionHeading"><div><p className="script gold">Our bestsellers ♡</p><h2>Cookies, Chinchin &amp; More</h2><p>Explore our most loved treats</p></div><span>Freshly made · Beautifully packed</span></div><div className="productGrid">{products.map((product) => <article key={product.id}><div className="productImage"><img src={product.image} alt={product.name}/><span>FRESH</span></div><div><h3>{product.name}</h3><p>{product.description}</p><strong>R{product.price.toFixed(2)}</strong><button onClick={() => add(product.id)}>ADD TO BASKET</button></div></article>)}</div></section>
-      <section className="story" id="story"><img src="/assets/products/couple-baking.jpg" alt="Crunch and Crumbs bakers"/><div><p className="script gold">Our story</p><h2>Homemade Goodness,<br/>Made for You</h2><div className="goldRule"/><p>Crunch &amp; Crumbs began as a husband-and-wife dream to bring homemade goodness to families across South Africa and beyond. Every batch is prepared with carefully selected ingredients, attention to detail and a passion for quality.</p><div className="storyValues"><span><Icon name="ingredients" size={26}/><b>Quality Ingredients</b><small>Only the best ingredients</small></span><span><Icon name="heart" size={26}/><b>Made with Love</b><small>Baked with passion</small></span><span><Icon name="trusted" size={26}/><b>Trusted by Many</b><small>Loved across SA</small></span></div></div></section>
-      <section className="reviews" id="reviews"><div><p className="eyebrow">CUSTOMER LOVE</p><h2>Loved by Our Customers</h2><div className="reviewGrid"><article><div>★★★★★</div><p>“The cookies are incredibly soft and delicious. Everything arrived fresh and beautifully packed.”</p><b>— Sarah M.</b></article><article><div>★★★★★</div><p>“Authentic chinchin with the perfect crunch. My whole family finished it in one sitting!”</p><b>— Naledi K.</b></article><article><div>★★★★★</div><p>“Our gift boxes looked premium and the service was warm from ordering through delivery.”</p><b>— Simphiwe T.</b></article></div></div><aside><img src="/assets/products/gift-box.jpg" alt="Crunch and Crumbs gift box"/><div><Icon name="gift" size={31}/><h3>Made for Every Celebration</h3><p>Thoughtful treats, beautifully presented.</p></div></aside></section>
-      <section className="orderCta"><div><p className="script">Ready for something delicious?</p><h2>Fresh treats are only a few clicks away.</h2><p>Build your basket and we'll confirm your order with you on WhatsApp.</p></div><a className="primary" href="#products">START YOUR ORDER</a></section>
+      <section className="arrivals" id="new-arrivals">
+        <div className="arrival-intro"><p>Shop the latest</p><h2>New<br/>Arrivals</h2><a href="#all">View all</a></div>
+        <div className="product-row">{looks.map((item) => <article key={item.name}><div className="product-photo"><img src={item.image} alt={item.name}/><span>New</span><button onClick={add}>+</button></div><h3>{item.name}</h3><p>{item.type}</p><b>{item.price}</b></article>)}</div>
+      </section>
+
+      <section className="philosophy"><strong>VONGA</strong><i/><div><blockquote>Elegance is not about being noticed —<br/>it’s about being remembered.</blockquote><span>The Vonga Philosophy</span></div></section>
+
+      <section className="collections" id="collections">
+        <article><img src="https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=1000&q=85" alt="A private tailoring appointment"/><h3>Bespoke Collection</h3><p>Made-to-measure. Made for you.</p><a href="#bespoke">Discover bespoke</a></article>
+        <article><img src="https://images.unsplash.com/photo-1551488831-00ddcb6c6bd3?auto=format&fit=crop&w=800&q=85" alt="Women's tailoring"/><h3>Womenswear</h3><p>Timeless pieces for every moment.</p><a href="#new-arrivals">Shop now</a></article>
+        <article><img src="https://images.unsplash.com/photo-1568252542512-9fe8fe9c87bb?auto=format&fit=crop&w=1000&q=85" alt="Occasion wear"/><h3>Occasion Wear</h3><p>For life's most unforgettable moments.</p><a href="#occasion">Explore</a></article>
+      </section>
+
+      <section className="experience"><div className="experience-title"><h2>The Vonga<br/>Experience</h2><span>Why choose us</span></div>{[["dress","Bespoke Tailoring","Every garment crafted to your exact measurements."],["fabric","Premium Fabrics","Sourced globally. Chosen consciously."],["scissors","Fast Turnaround","Ready-to-wear dispatched within 48 hours."],["truck","Nationwide Delivery","Free delivery on orders over R1500."]].map(x=><article key={x[1]}><Icon name={x[0]}/><b>{x[1]}</b><p>{x[2]}</p></article>)}</section>
+
+      <section className="appointment" id="bespoke"><div><h2>Need something unique?</h2><p>Book a private fitting with our designer.</p><button onClick={() => setNotice(3)}>Schedule appointment</button></div></section>
+
+      <section className="lookbook" id="lookbook"><div><p>From the lookbook</p><h2>Style. Story. Soul.</h2><a href="#lookbook">View Lookbook</a></div><div className="look-strip"><img src="https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&w=1400&q=85" alt="Vonga lookbook editorial"/></div></section>
     </main>
-    {checkout && <div className="overlay" onMouseDown={(e) => e.target === e.currentTarget && setCheckout(false)}><aside className="checkout"><button className="close" onClick={() => setCheckout(false)}>×</button><h2>Your order</h2>{!items.length ? <div className="emptyBasket"><Icon name="gift" size={45}/><p>Your basket is empty.<br/>Add some treats to get started.</p></div> : <>{items.map((item) => <div className="line" key={item.id}><span><b>{item.name}</b><small>R{item.price.toFixed(2)} each</small></span><span className="quantity"><button onClick={() => change(item.id,-1)}>−</button>{item.quantity}<button onClick={() => change(item.id,1)}>+</button></span></div>)}<div className="total"><span>Total</span><b>R{(subtotal + (subtotal >= 200 ? 0 : 35)).toFixed(2)}</b></div>{subtotal < 200 && <small>Includes R35 delivery. Spend R{(200-subtotal).toFixed(2)} more for free delivery.</small>}<form onSubmit={placeOrder}><input name="name" placeholder="Full name" required/><input name="phone" placeholder="WhatsApp number" required/><textarea name="address" placeholder="Delivery address" required/><textarea name="notes" placeholder="Order notes (optional)"/><button className="primary submit" disabled={busy}>{busy ? "PLACING ORDER..." : "PLACE ORDER"}</button></form></>}{result && <p className="result">{result}</p>}</aside></div>}
-    <footer id="contact"><div className="footerMain"><div><img src="/assets/logo-light.png" alt="Crunch & Crumbs"/><p>Homemade cookies and authentic Nigerian chinchin, baked fresh in South Africa.</p></div><div><h4>Explore</h4><a href="#products">Our Products</a><a href="#story">Our Story</a><a href="#reviews">Reviews</a></div><div><h4>Order &amp; Support</h4><a href="tel:+27782890907">+27 78 289 0907</a><a href="mailto:hello@crunchandcrumbs.co.za">hello@crunchandcrumbs.co.za</a><a href="/login">Merchant sign in</a></div><div><h4>Fresh from our kitchen</h4><p>Follow along for new flavours, gifting ideas and seasonal treats.</p><span>Instagram &nbsp; Facebook &nbsp; TikTok</span></div></div><div className="footerBottom"><span>© 2026 Crunch &amp; Crumbs. All rights reserved.</span><span>Commerce powered by thoughtful automation.</span></div></footer>
-    <button className="floatingCart" onClick={() => setCheckout(true)}><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path d="M3 6h18"/></svg><span>{count}</span> View order</button>
-  </>;
+
+    <footer><div className="newsletter"><p>Be the first to know</p><span>Sign up for early access, new arrivals<br/>and exclusive offers.</span><form onSubmit={e => {e.preventDefault(); setNotice(4)}}><input aria-label="Email address" placeholder="Your email address" type="email" required/><button>Subscribe</button></form></div><div className="footer-brand"><b>VONGA</b><em>Elegance Redefined.</em><span>◎ &nbsp; f &nbsp; ♪ &nbsp; ◉</span></div><div className="footer-links"><div><b>Shop</b><a>New Arrivals</a><a>Dresses</a><a>Outerwear</a><a>Occasion Wear</a></div><div><b>Help</b><a>Size Guide</a><a>Shipping</a><a>Returns</a><a>Contact Us</a></div><div><b>Visit us</b><a>Pretoria Boutique</a><a>Waterkloof Glen</a><a>Pretoria, South Africa</a></div></div><div className="copyright">© 2026 VONGA. All rights reserved. <span>Privacy Policy &nbsp;&nbsp; Terms &amp; Conditions &nbsp;&nbsp; Cookie Policy</span></div></footer>
+    {notice > 0 && <div className="v-toast">{notice === 1 ? "Added to your bag" : notice === 2 ? (bag ? `${bag} item${bag > 1 ? "s" : ""} in your bag` : "Your bag is currently empty") : notice === 3 ? "Appointment request received" : "Welcome to the Vonga list"}</div>}
+  </div>;
 }

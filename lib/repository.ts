@@ -20,9 +20,9 @@ export async function getProducts(): Promise<Product[]> {
   if (!isSupabaseConfigured()) return localProducts;
   const admin = createSupabaseAdminClient();
   const id = await merchantId();
-  const { data, error } = await admin.from("products").select("external_id,name,description,price,image,active").eq("merchant_id", id).eq("active", true).order("created_at");
+  const { data, error } = await admin.from("products").select("external_id,name,description,price,image,active,category").eq("merchant_id", id).eq("active", true).order("created_at");
   if (error) throw new Error(error.message);
-  return (data ?? []).map((row) => ({ id: row.external_id, merchantId: id, name: row.name, description: row.description, price: money(row.price), image: row.image, active: row.active }));
+  return (data ?? []).map((row) => ({ id: row.external_id, merchantId: id, name: row.name, description: row.description, price: money(row.price), image: row.image, active: row.active, category: row.category ?? "Cookies" }));
 }
 
 export async function getDashboardData(): Promise<StoreData> {
@@ -30,7 +30,7 @@ export async function getDashboardData(): Promise<StoreData> {
   const supabase = await createSupabaseServerClient();
   const id = await merchantId();
   const [productResult, customerResult, orderResult, itemResult, eventResult] = await Promise.all([
-    supabase.from("products").select("external_id,name,description,price,image,active").eq("merchant_id", id),
+    supabase.from("products").select("external_id,name,description,price,image,active,category").eq("merchant_id", id),
     supabase.from("customers").select("*").eq("merchant_id", id).order("created_at", { ascending: false }),
     supabase.from("orders").select("*").eq("merchant_id", id).order("created_at", { ascending: false }),
     supabase.from("order_items").select("*").eq("merchant_id", id),
@@ -39,7 +39,7 @@ export async function getDashboardData(): Promise<StoreData> {
   const failure = [productResult, customerResult, orderResult, itemResult, eventResult].find((result) => result.error)?.error;
   if (failure) throw new Error(failure.message);
   return {
-    products: (productResult.data ?? []).map((row) => ({ id: row.external_id, merchantId: id, name: row.name, description: row.description, price: money(row.price), image: row.image, active: row.active })),
+    products: (productResult.data ?? []).map((row) => ({ id: row.external_id, merchantId: id, name: row.name, description: row.description, price: money(row.price), image: row.image, active: row.active, category: row.category ?? "Cookies" })),
     customers: (customerResult.data ?? []).map((row) => ({ id: row.id, merchantId: row.merchant_id, name: row.name, phone: row.phone, address: row.address, orderCount: row.order_count, totalSpent: money(row.total_spent), createdAt: row.created_at })),
     orders: (orderResult.data ?? []).map((row) => ({ id: row.id, merchantId: row.merchant_id, customerId: row.customer_id, customerName: row.customer_name, phone: row.phone, address: row.address, notes: row.notes, items: (itemResult.data ?? []).filter((item) => item.order_id === row.id).map((item) => ({ productId: item.product_external_id, name: item.name, price: money(item.price), quantity: item.quantity })), subtotal: money(row.subtotal), deliveryFee: money(row.delivery_fee), total: money(row.total), status: row.status as OrderStatus, createdAt: row.created_at })),
     events: (eventResult.data ?? []).map((row) => ({ id: row.id, merchantId: row.merchant_id, type: row.type, orderId: row.order_id, status: row.status, message: row.message, createdAt: row.created_at })),

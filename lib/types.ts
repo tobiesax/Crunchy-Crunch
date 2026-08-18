@@ -1,4 +1,4 @@
-export type Product = { id: string; merchantId: string; name: string; description: string; price: number; image: string; active: boolean };
+export type Product = { id: string; merchantId: string; name: string; description: string; price: number; image: string; active: boolean; category: string };
 export type OrderStatus = "new" | "payment_pending" | "confirmed" | "preparing" | "ready" | "delivered";
 export type OrderItem = { productId: string; name: string; price: number; quantity: number };
 export type Customer = { id: string; merchantId: string; name: string; phone: string; address: string; orderCount: number; totalSpent: number; createdAt: string };
